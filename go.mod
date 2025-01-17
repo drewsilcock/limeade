@@ -1,4 +1,4 @@
-module github.com/drewsilcock/lemonade
+module github.com/drewsilcock/limeade
 
 go 1.23
 

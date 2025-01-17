@@ -9,13 +9,13 @@ import (
 // installCmd represents the install command
 var installCmd = &cobra.Command{
 	Use:   "install",
-	Short: "Install lemonade client on remote machine",
-	Long: `Runs helper script to install lemonade on a remote machine via SSH.
+	Short: "Install limeade client on remote machine",
+	Long: `Runs helper script to install limeade on a remote machine via SSH.
 
 Given a hostname, this command will SSH into the remote machine and run the
-installation script to make lemonade available on the remote machine,
+installation script to make limeade available on the remote machine,
 enabling copy and pasting between the host and the remote SSH machine via
-lemonade.`,
+limeade.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("TODO: implement install command")
 	},

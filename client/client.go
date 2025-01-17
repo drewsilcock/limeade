@@ -2,7 +2,7 @@ package client
 
 import (
 	"fmt"
-	"github.com/drewsilcock/lemonade/server"
+	"github.com/drewsilcock/limeade/server"
 	"log/slog"
 	"net"
 	"time"

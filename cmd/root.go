@@ -16,7 +16,7 @@ var pbpasteRegex = regexp.MustCompile("/?pbpaste$")
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "lemonade",
+	Use:   "limeade",
 	Short: "Copy and paste between client and server machines.",
 	Long: `Use Unix sockets to share a clipboard with a remote
 machine, such as over SSH.`,

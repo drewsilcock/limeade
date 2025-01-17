@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/drewsilcock/lemonade/client"
+	"github.com/drewsilcock/limeade/client"
 )
 
 // copyCmd represents the copy command

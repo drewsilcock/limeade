@@ -7,7 +7,7 @@ import (
 
 	"github.com/lmittmann/tint"
 
-	"github.com/drewsilcock/lemonade/cmd"
+	"github.com/drewsilcock/limeade/cmd"
 )
 
 var (

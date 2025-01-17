@@ -7,14 +7,14 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/drewsilcock/lemonade/server"
+	"github.com/drewsilcock/limeade/server"
 )
 
 // serverCmd represents the server command
 var serverCmd = &cobra.Command{
 	Use:   "server",
-	Short: "Run the lemonade server",
-	Long:  `Run the lemonade server.`,
+	Short: "Run the limeade server",
+	Long:  `Run the limeade server.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		runServer()
 	},

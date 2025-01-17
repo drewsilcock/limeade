@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/drewsilcock/lemonade/client"
+	"github.com/drewsilcock/limeade/client"
 )
 
 // pasteCmd represents the paste command
