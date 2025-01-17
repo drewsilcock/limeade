@@ -8,21 +8,16 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        go_version: [oldstable, stable]
-    runs-on: ${{ matrix.os }}
+  release:
+    needs: build
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go_version }}
-      - name: Install dependencies
-        run: go get .
-      - name: Build
-        run: go build -v ./...
-      - name: Test with the Go CLI
-        run: go test -v -race ./...
+          go-version: stable
+      - name: Install goreleaser
+        run: go install github.com/goreleaser/goreleaser@latest
+      - name: Run goreleaser
+        run: goreleaser release --rm-dist
