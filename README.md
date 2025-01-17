@@ -94,7 +94,7 @@ This project is a fork of [lemonade-command/lemonade](https://github.com/lemonad
 - Set up CI/CD with GitHub actions and add installer script.
 - Stop using TPC and RPC and use Unix sockets with simple custom serialisation format instead.
 - Focus on Posix-compatible systems instead of Windows, removing option for automatic line-ending translation.
-- The :lemon: emojis have been replaced with :lime: emojis.
+- The 🍋 emojis have been replaced with  🍋‍🟩 emojis.
 
 ## Todo
 
