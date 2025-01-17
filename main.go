@@ -10,6 +10,12 @@ import (
 	"github.com/drewsilcock/lemonade/cmd"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func main() {
 	slog.SetDefault(slog.New(
 		tint.NewHandler(os.Stderr, &tint.Options{
@@ -18,5 +24,6 @@ func main() {
 		}),
 	))
 
+	cmd.SetVersionInfo(version, commit, date)
 	cmd.Execute()
 }

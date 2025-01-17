@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 	"regexp"
@@ -52,6 +53,10 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
+}
+
+func SetVersionInfo(version, commit, date string) {
+	rootCmd.Version = fmt.Sprintf("%s built at %s from commit %s", version, date, commit)
 }
 
 func init() {

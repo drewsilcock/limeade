@@ -1,30 +1,32 @@
-# Lemonade
+# Limeade
+
+![Linting](https://github.com/github/docs/actions/workflows/lint.yml/badge.svg)
+![Testing](https://github.com/github/docs/actions/workflows/test.yml/badge.svg)
 
 remote...lemote...lemode......Lemonade.........Limeade! 🍋‍🟩
 
-Lemonade is a remote utility tool.
-(copy, paste and open browser) over TCP.
+Limeade is a tool for remote clipboard access, i.e. copy and paste over SSH.
 
-[![Build Status](https://travis-ci.org/lemonade-command/lemonade.svg?branch=master)](https://travis-ci.org/lemonade-command/lemonade)
+It is a fork of [lemonade-command/lemonade](https://github.com/lemonade-command/lemonade).
 
 ## Installation
 
 ### Installer script
 
-curl -sSfL https://raw.githubusercontent.com/drewsilcock/lemonade/main/install.sh | sh -s
+curl -sSfL https://raw.githubusercontent.com/drewsilcock/limeade/main/install.sh | sh -s
 
 ### Go install
 
 ```sh
-go install github.com/drewsilcock/lemonade-command@latest
+go install github.com/drewsilcock/limeade/cmd@latest
 ```
 
 ### Build from source
 
 ```sh
-git clone git@github.com:drewsilcock/lemonade
-cd lemonade
-make install
+git clone git@github.com:drewsilcock/limeade
+cd limeade
+go build
 ```
 
 ## Example of use
