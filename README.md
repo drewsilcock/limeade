@@ -1,6 +1,7 @@
 # Limeade
 
 ![Linting](https://github.com/github/docs/actions/workflows/lint.yml/badge.svg)
+
 ![Testing](https://github.com/github/docs/actions/workflows/test.yml/badge.svg)
 
 remote...lemote...lemode......Lemonade.........Limeade! 🍋‍🟩
