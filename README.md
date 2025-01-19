@@ -7,7 +7,7 @@ remote...lemote...lemode......Lemonade.........Limeade! 🍋‍🟩
 
 Limeade is a tool for remote clipboard access, i.e. copy and paste over SSH.
 
-It is a fork of [lemonade-command/lemonade](https://github.com/lemonade-command/lemonade).
+This is a fork of [lemonade-command/lemonade](https://github.com/lemonade-command/lemonade).
 
 ## Installation
 
@@ -18,7 +18,7 @@ curl -sSfL https://raw.githubusercontent.com/drewsilcock/limeade/main/install.sh
 ### Go install
 
 ```sh
-go install github.com/drewsilcock/limeade/cmd@latest
+go install github.com/drewsilcock/limeade@latest
 ```
 
 ### Build from source
