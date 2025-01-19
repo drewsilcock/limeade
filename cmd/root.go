@@ -64,7 +64,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&socketFile, "socket", "/tmp/lemonade.sock", "socket file (default is /var/run/lemonade.sock)")
+	rootCmd.PersistentFlags().StringVar(&socketFile, "socket", "/tmp/limeade.sock", "socket file (default is /var/run/limeade.sock)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
