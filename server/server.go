@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net"
@@ -164,16 +165,18 @@ func Serve(socketFile string) error {
 	for {
 		conn, err := socket.Accept()
 		if err != nil {
-			slog.Error(fmt.Sprintf("failed to accept connection: %s", err))
+			if !errors.Is(err, net.ErrClosed) {
+				slog.Error(fmt.Sprintf("Failed to accept connection: %s", err))
+			}
 			continue
 		}
 
 		if err := conn.SetDeadline(time.Now().Add(time.Second * 10)); err != nil {
-			slog.Error(fmt.Sprintf("failed to set deadline on connection: %s", err))
+			slog.Error(fmt.Sprintf("Failed to set deadline on connection: %s", err))
 			continue
 		}
 
-		slog.Info("Request from " + conn.RemoteAddr().String())
+		slog.Debug("Accepted connection")
 		go handleRequest(conn)
 	}
 }
@@ -193,7 +196,7 @@ func handleRequest(conn net.Conn) {
 		response.Data = ""
 		_, err := conn.Write(response.Bytes())
 		if err != nil {
-			slog.Error(fmt.Sprintf("failed to write to connection: %s", err))
+			slog.Error(fmt.Sprintf("Failed to write to connection: %s", err))
 		}
 
 		return
@@ -201,14 +204,14 @@ func handleRequest(conn net.Conn) {
 
 	switch request.Command {
 	case CommandCopy:
-		if err := clipboard.WriteAll(string(request.Data)); err != nil {
-			errMsg := fmt.Sprintf("failed to write to clipboard: %s", err)
+		if err := clipboard.WriteAll(request.Data); err != nil {
+			errMsg := fmt.Sprintf("Failed to write to clipboard: %s", err)
 			slog.Error(errMsg)
 			response.Status = ResponseStatusErrClipboardWriteErr
 			response.Data = errMsg
 			_, err := conn.Write(response.Bytes())
 			if err != nil {
-				slog.Error(fmt.Sprintf("failed to write to connection: %s", err))
+				slog.Error(fmt.Sprintf("Failed to write to connection: %s", err))
 			}
 
 			return
@@ -218,17 +221,19 @@ func handleRequest(conn net.Conn) {
 		response.Data = ""
 		_, err = conn.Write(response.Bytes())
 		if err != nil {
-			slog.Error(fmt.Sprintf("failed to write to connection: %s", err))
+			slog.Error(fmt.Sprintf("Failed to write to connection: %s", err))
 		}
+
+		slog.Info(fmt.Sprintf("Copied %d bytes to clipboard", len(request.Data)))
 	case CommandPaste:
 		text, err := clipboard.ReadAll()
 		if err != nil {
-			slog.Error(fmt.Sprintf("failed to read from clipboard: %s", err))
+			slog.Error(fmt.Sprintf("Failed to read from clipboard: %s", err))
 			response.Status = ResponseStatusErrClipboardReadErr
 			response.Data = ""
 			_, err := conn.Write(response.Bytes())
 			if err != nil {
-				slog.Error(fmt.Sprintf("failed to write to connection: %s", err))
+				slog.Error(fmt.Sprintf("Failed to write to connection: %s", err))
 			}
 
 			return
@@ -238,7 +243,9 @@ func handleRequest(conn net.Conn) {
 		response.Data = text
 		_, err = conn.Write(response.Bytes())
 		if err != nil {
-			slog.Error(fmt.Sprintf("failed to write to connection: %s", err))
+			slog.Error(fmt.Sprintf("Failed to write to connection: %s", err))
 		}
+
+		slog.Info(fmt.Sprintf("Pasted %d bytes from clipboard", len(text)))
 	}
 }

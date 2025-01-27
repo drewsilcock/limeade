@@ -75,7 +75,7 @@ function Summarise-Tests {
     )
 
     if ($numFails -eq 0) {
-        Write-Output "✅ All tests passed"
+        Write-Output "✅ All $TOTAL_NUM_TESTS/$TOTAL_NUM_TESTS tests passed"
         exit $EXIT_SUCCESS
     } else {
         Write-Output "❌ $numFails/$TOTAL_NUM_TESTS tests failed"
