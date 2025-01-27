@@ -13,12 +13,6 @@ jobs:
         go_version: [oldstable, stable]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Set up Xvfb and xclip
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get install -y xvfb xclip
-          sudo Xvfb :99 -ac -screen 0 1024x768x8 &
-          export DISPLAY=:99
       - uses: actions/checkout@v4
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -38,4 +32,8 @@ jobs:
         run: .\scripts\test_windows.ps1
       - name: Integration test scripts (Linux)
         if: matrix.os == 'ubuntu-latest'
-        run: ./scripts/test_linux.sh
+        run: |
+          sudo apt-get install -y xvfb xclip
+          sudo Xvfb :99 -ac -screen 0 1024x768x8 &
+          export DISPLAY=:99
+          ./scripts/test_linux.sh
