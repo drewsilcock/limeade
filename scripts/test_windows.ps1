@@ -24,7 +24,7 @@ function Cleanup-LimeadeProcesses {
 
 function Start-Server {
     Cleanup-LimeadeProcesses
-    Start-Process -NoNewWindow -FilePath "./limeade" -ArgumentList "server"
+    Start-Process -NoNewWindow -FilePath "go" -ArgumentList "run ./... server"
 }
 
 function Test-CopyStdin {
@@ -33,7 +33,7 @@ function Test-CopyStdin {
     # Clear the clipboard
     Set-Clipboard -Value ""
 
-    $stdinCopyText | ./limeade copy
+    $stdinCopyText | go run ./... copy
     $output = Get-Clipboard | Out-String
     if ($output.Trim() -eq $stdinCopyText) {
         return 0
@@ -48,7 +48,7 @@ function Test-CopyArg {
     # Clear the clipboard
     Set-Clipboard -Value ""
 
-    ./limeade copy $argCopyText
+    go run ./... copy $argCopyText
     $output = Get-Clipboard | Out-String
     if ($output.Trim() -eq $argCopyText) {
         return 0
@@ -63,7 +63,7 @@ function Test-Paste {
     # Set the clipboard to the paste text
     Set-Clipboard -Value $pasteText
 
-    $output = ./limeade paste | Out-String
+    $output = go run ./... paste | Out-String
     if ($output.Trim() -eq $pasteText) {
         return 0
     } else {
@@ -89,7 +89,7 @@ function Run-Tests {
     $numFails = 0
 
     Write-Output "Running integration tests for Windows"
-    ./limeade --version
+    go run ./... --version
 
     Write-Output "Starting limeade server"
     Start-Server

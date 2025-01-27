@@ -23,7 +23,7 @@ function cleanup {
 
 function start_server {
   trap cleanup SIGINT SIGTERM EXIT
-  ./limeade server &
+  go run ./... server &
 }
 
 function test_copy_stdin {
@@ -34,7 +34,7 @@ function test_copy_stdin {
 
   $copy_cmd ""
 
-  echo $stdin_copy_text | ./limeade copy
+  echo $stdin_copy_text | go run ./... copy
   if [[ $($paste_cmd) = $stdin_copy_text ]]; then
     echo "✅ Copy stdin test passed"
     return 0
@@ -52,7 +52,7 @@ function test_copy_arg {
 
   $copy_cmd ""
 
-  ./limeade copy "$arg_copy_text"
+  go run ./... copy "$arg_copy_text"
   if [[ $($paste_cmd) = $arg_copy_text ]]; then
     echo "✅ Copy arg test passed"
     return 0
@@ -70,7 +70,7 @@ function test_paste {
 
   $copy_cmd "$paste_text"
 
-  if [[ $(./limeade paste) = $paste_text ]]; then
+  if [[ $(go run ./... paste) = $paste_text ]]; then
     echo "✅ Paste test passed"
     return 0
   else
@@ -97,7 +97,7 @@ function run {
 
   num_fails=0
 
-  ./limeade --version
+  go run ./... --version
 
   echo "Starting limeade server"
   start_server
