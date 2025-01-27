@@ -19,7 +19,7 @@ function Require-Command {
 
 function Cleanup-LimeadeProcesses {
     Stop-Process -Name limeade -ErrorAction SilentlyContinue
-    Remove-Item -Path /tmp/limeade.sock -ErrorAction SilentlyContinue
+    Remove-Item -Path $TMP/limeade.sock -ErrorAction SilentlyContinue
 }
 
 function Start-Server {

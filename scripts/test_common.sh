@@ -17,7 +17,7 @@ function require_command {
 
 function cleanup {
   local exit_code=$?
-  kill -- -$$ || true
+  kill -- -$$ 2> /dev/null || true
   exit $exit_code
 }
 
