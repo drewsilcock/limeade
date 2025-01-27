@@ -152,13 +152,13 @@ func Serve(socketFile string) error {
 	}
 
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
-	go func() {
+	signal.Notify(signalChan, os.Interrupt, os.Kill, syscall.SIGTERM)
+	go func(c chan os.Signal) {
 		<-signalChan
 		_ = socket.Close()
 		_ = os.Remove(socketFile)
 		os.Exit(0)
-	}()
+	}(signalChan)
 
 	slog.Info(fmt.Sprintf("Server listening on '%s'", socketFile))
 
