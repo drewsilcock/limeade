@@ -17,9 +17,14 @@ function Require-Command {
     }
 }
 
+function Cleanup-LimeadeProcesses {
+    Stop-Process -Name limeade -ErrorAction SilentlyContinue
+    Remove-Item -Path /tmp/limeade.sock -ErrorAction SilentlyContinue
+}
+
 function Start-Server {
-    # Start server in background
-    Start-Process -NoNewWindow -FilePath "powershell" -ArgumentList "-Command ./limeade server"
+    Cleanup-LimeadeProcesses
+    Start-Process -NoNewWindow -FilePath "./limeade" -ArgumentList "server"
 }
 
 function Test-CopyStdin {
@@ -29,11 +34,10 @@ function Test-CopyStdin {
     Set-Clipboard -Value ""
 
     $stdinCopyText | ./limeade copy
-    if (Get-Clipboard -eq $stdinCopyText) {
-        Write-Output "✅ Copy stdin test passed"
+    $output = Get-Clipboard | Out-String
+    if ($output.Trim() -eq $stdinCopyText) {
         return 0
     } else {
-        Write-Output "❌ Copy stdin test failed"
         return 1
     }
 }
@@ -45,11 +49,10 @@ function Test-CopyArg {
     Set-Clipboard -Value ""
 
     ./limeade copy $argCopyText
-    if (Get-Clipboard -eq $argCopyText) {
-        Write-Output "✅ Copy arg test passed"
+    $output = Get-Clipboard | Out-String
+    if ($output.Trim() -eq $argCopyText) {
         return 0
     } else {
-        Write-Output "❌ Copy arg test failed"
         return 1
     }
 }
@@ -60,11 +63,10 @@ function Test-Paste {
     # Set the clipboard to the paste text
     Set-Clipboard -Value $pasteText
 
-    if ((./limeade paste) -eq $pasteText) {
-        Write-Output "✅ Paste test passed"
+    $output = ./limeade paste | Out-String
+    if ($output.Trim() -eq $pasteText) {
         return 0
     } else {
-        Write-Output "❌ Paste test failed"
         return 1
     }
 }
@@ -92,16 +94,35 @@ function Run-Tests {
     Write-Output "Starting limeade server"
     Start-Server
 
-    Test-CopyStdin
-    $numFails += $?
+    $result = Test-CopyStdin
+    if ($result -eq 0) {
+        Write-Output "✅ Copy arg test passed"
+    } else {
+        Write-Output "❌ Copy arg test failed"
+        $numFails += 1
+    }
 
-    Test-CopyArg
-    $numFails += $?
+    $result = Test-CopyArg
+    if ($result -eq 0) {
+        Write-Output "✅ Copy arg test passed"
+    } else {
+        Write-Output "❌ Copy arg test failed"
+        $numFails += 1
+    }
 
-    Test-Paste
-    $numFails += $?
+    $result = Test-Paste
+    if ($result -eq 0) {
+        Write-Output "✅ Paste test passed"
+    } else {
+        Write-Output "❌ Paste test failed"
+        $numFails += 1
+    }
 
     Summarise-Tests -numFails $numFails
 }
 
-Run-Tests
+try {
+    Run-Tests
+} finally {
+    Cleanup-LimeadeProcesses
+}
