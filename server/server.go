@@ -152,7 +152,7 @@ func Serve(socketFile string) error {
 	}
 
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, os.Interrupt, os.Kill, syscall.SIGTERM)
+	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
 	go func(c chan os.Signal) {
 		<-signalChan
 		_ = socket.Close()
