@@ -1,69 +1,107 @@
-# Exit codes
-$exit_success = 0
-$exit_test_failure = 1
-$exit_script_error = 2
+$EXIT_SUCCESS = 0
+$EXIT_TEST_FAILURE = 1
+$EXIT_SCRIPT_ERROR = 2
 
-# Check if Get-Clipboard and Set-Clipboard cmdlets are available
-if (-not (Get-Command Set-Clipboard -ErrorAction SilentlyContinue)) {
-    Write-Output "Set-Clipboard is required to run this script"
-    exit $exit_script_error
+$TOTAL_NUM_TESTS = 3
+
+function Require-Command {
+    param (
+        [string]$cmd,
+        [string]$installHelp
+    )
+
+    if (-not (Get-Command $cmd -ErrorAction SilentlyContinue)) {
+        Write-Output "$cmd is required to run this script"
+        Write-Output "$installHelp"
+        exit $EXIT_SCRIPT_ERROR
+    }
 }
 
-if (-not (Get-Command Get-Clipboard -ErrorAction SilentlyContinue)) {
-    Write-Output "Get-Clipboard is required to run this script"
-    exit $exit_script_error
+function Start-Server {
+    # Start server in background
+    Start-Process -NoNewWindow -FilePath "powershell" -ArgumentList "-Command ./limeade server"
 }
 
-# 0 = success, 1 = failure
-$test_status = 0
+function Test-CopyStdin {
+    $stdinCopyText = "Your shadow at morning striding behind you or your shadow at evening rising to meet you"
 
-# Start server in background
-Start-Process -NoNewWindow -FilePath "powershell" -ArgumentList "-Command ./limeade server"
+    # Clear the clipboard
+    Set-Clipboard -Value ""
 
-./limeade --version
-
-# Test copy command
-$arg_copy_text = "I will show you something different from either"
-$stdin_copy_text = "Your shadow at morning striding behind you or your shadow at evening rising to meet you"
-
-Set-Clipboard -Value ""
-
-./limeade copy $arg_copy_text
-if ((Get-Clipboard) -eq $arg_copy_text) {
-    Write-Output "✅ Copy arg test passed"
-} else {
-    Write-Output "❌ Copy arg test failed"
-    $test_status = 1
+    $stdinCopyText | ./limeade copy
+    if (Get-Clipboard -eq $stdinCopyText) {
+        Write-Output "✅ Copy stdin test passed"
+        return 0
+    } else {
+        Write-Output "❌ Copy stdin test failed"
+        return 1
+    }
 }
 
-Set-Clipboard -Value ""
+function Test-CopyArg {
+    $argCopyText = "I will show you something different from either"
 
-$stdin_copy_text | ./limeade copy
-if ((Get-Clipboard) -eq $stdin_copy_text) {
-    Write-Output "✅ Copy stdin test passed"
-} else {
-    Write-Output "❌ Copy stdin test failed"
-    $test_status = 1
+    # Clear the clipboard
+    Set-Clipboard -Value ""
+
+    ./limeade copy $argCopyText
+    if (Get-Clipboard -eq $argCopyText) {
+        Write-Output "✅ Copy arg test passed"
+        return 0
+    } else {
+        Write-Output "❌ Copy arg test failed"
+        return 1
+    }
 }
 
-# Test paste command
+function Test-Paste {
+    $pasteText = "I will show you fear in a handful of dust."
 
-$paste_text = "I will show you fear in a handful of dust."
+    # Set the clipboard to the paste text
+    Set-Clipboard -Value $pasteText
 
-# Set the clipboard to the paste text
-Set-Clipboard -Value $paste_text
-
-if ((./limeade paste) -eq $paste_text) {
-    Write-Output "✅ Paste test passed"
-} else {
-    Write-Output "❌ Paste test failed"
-    $test_status = 1
+    if ((./limeade paste) -eq $pasteText) {
+        Write-Output "✅ Paste test passed"
+        return 0
+    } else {
+        Write-Output "❌ Paste test failed"
+        return 1
+    }
 }
 
-if ($test_status -eq 0) {
-    Write-Output "✅ All tests passed"
-    exit $exit_success
-} else {
-    Write-Output "❌ Some tests failed"
-    exit $exit_test_failure
+function Summarise-Tests {
+    param (
+        [int]$numFails
+    )
+
+    if ($numFails -eq 0) {
+        Write-Output "✅ All tests passed"
+        exit $EXIT_SUCCESS
+    } else {
+        Write-Output "❌ $numFails/$TOTAL_NUM_TESTS tests failed"
+        exit $EXIT_TEST_FAILURE
+    }
 }
+
+function Run-Tests {
+    $numFails = 0
+
+    Write-Output "Running integration tests for Windows"
+    ./limeade --version
+
+    Write-Output "Starting limeade server"
+    Start-Server
+
+    Test-CopyStdin
+    $numFails += $?
+
+    Test-CopyArg
+    $numFails += $?
+
+    Test-Paste
+    $numFails += $?
+
+    Summarise-Tests -numFails $numFails
+}
+
+Run-Tests
