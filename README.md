@@ -61,7 +61,7 @@ Host host
     User user
     HostName host
     ...
-    RemoteForward /tmp/limeade.sock localhost:/tmp/limeade.sock
+    RemoteForward /tmp/limeade.sock:/tmp/limeade.sock
 ```
 
 ### Alias
@@ -80,7 +80,7 @@ $ echo "Hello" | pbcopy  # Same as 'echo "Hello" | limeade copy'
 Neovim will automatically detect lemonade in a remote environment, but not limeade. For this reason, you can just alias limeade to lemonade:
 
 ```shell
-ln -s /path/to/limeade /usr/bin/lemonade
+ln -s /path/to/limeade /usr/local/bin/lemonade
 ```
 
 ## Limeade vs. Lemonade
