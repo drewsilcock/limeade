@@ -135,6 +135,12 @@ sudo sh -c 'echo "StreamLocalBindUnlink yes" >> /etc/ssh/sshd_config'
 
 (For more details, see [this Unix StackExchange post](https://unix.stackexchange.com/questions/427189/how-to-cleanup-ssh-reverse-tunnel-socket-after-connection-closed)).
 
+**Caveat:** with the `StreamLocalBindUnlink` option enabled, the socket file will be valid as long as the most recently connected SSH session is still connected. Because SSH unlinks (deletes) the socket file before binding, the most recent SSH session will be the one doing the actual forwarding. If that quits, the socket forwarding will fail for any other connected sessions.
+
+One solution to this is that you only do the socket forwarding for one SSH session at a time and if you need multiple SSH sessions connected concurrently, you simply omit the socket forward from all of the subsequent SSH sessions after the initial one. That way, only the first SSH session is doing the forwarding.
+
+### That didn't work
+
 If this doesn't fix the issue, you can try the following:
 
 First, check the [sshd config](https://man7.org/linux/man-pages/man5/sshd_config.5.html) (usually `/etc/ssh/sshd_config` and sometimes `/etc/ssh/sshd_config.d/*`) – if `AllowStreamLocalForwarding no` is set, you won't be able to forward any sockets. The default is `yes` so if it's not specified, it should work.
