@@ -55,8 +55,8 @@ func Execute() {
 	}
 }
 
-func SetVersionInfo(version, commit, date string) {
-	rootCmd.Version = fmt.Sprintf("%s built at %s from commit %s", version, date, commit)
+func SetVersionInfo(version, commit, commitDate, goVersion string) {
+	rootCmd.Version = fmt.Sprintf("%s built from commit %s (%s) [%s]", version, commit, commitDate, goVersion)
 }
 
 func init() {
