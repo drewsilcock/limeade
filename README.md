@@ -127,6 +127,16 @@ It'd be nice to use a supported library, but the golang-design/clipboard library
 
 This can happen if the server fails to listen on the desired socket path, e.g. if it is not allowed in the sshd config or the path is already in use.
 
+Most commonly, this happens if you SSH into a server, quit the SSH connection, then reconnect. For some reason, by default OpenSSH has two 'features': a) don't clean up forward socket files on remote machine and b) fail to forward socket file if it already exists. You can either manually clean up this file every time which is a pain, or you can set the `StreamLocalBindUnlink` option to `yes` in the `sshd_config`:
+
+```shell
+sudo sh -c 'echo "StreamLocalBindUnlink yes" >> /etc/ssh/sshd_config'
+```
+
+(For more details, see [this Unix StackExchange post](https://unix.stackexchange.com/questions/427189/how-to-cleanup-ssh-reverse-tunnel-socket-after-connection-closed)).
+
+If this doesn't fix the issue, you can try the following:
+
 First, check the [sshd config](https://man7.org/linux/man-pages/man5/sshd_config.5.html) (usually `/etc/ssh/sshd_config` and sometimes `/etc/ssh/sshd_config.d/*`) – if `AllowStreamLocalForwarding no` is set, you won't be able to forward any sockets. The default is `yes` so if it's not specified, it should work.
 
 Second, check the sshd logs. It's not easy to do this for a production service so the best thing to do is start another sshd service on another port which you can safely run in debug mode without risking locking yourself out of your remote machine:
@@ -168,10 +178,4 @@ Then this means that something is already binding to the socket file `/tmp/limea
 lsof /tmp/limeade.sock
 ```
 
-Is that doesn't show anything, you might've just accidentally left the file there from a previous run. You can remove it with:
-
-```shell
-rm /tmp/limeade.sock
-```
-
-Then try again. You can also enable the sshd_config setting `StreamLocalBindUnlink yes` which will automatically remove the socket file immediately before binding to it, which will ensure no-one else is binding to the socket but will delete the socket file.
+Is that doesn't show anything, you might've just accidentally left the file there from a previous run. You can remove it manually or set the `StreamLocalBindUnlink` option to `yes` as described above.

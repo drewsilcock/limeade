@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"regexp"
+	"runtime"
 
 	"github.com/spf13/cobra"
 )
@@ -75,6 +77,12 @@ func init() {
 
 func initConfig() {
 	if socketFile == "" {
-		socketFile = os.TempDir() + "/limeade.sock"
+		// On Windows, use %TMPDIR% instead of /tmp which doesn't exist.
+		baseDir := "/tmp"
+		if runtime.GOOS == "windows" {
+			baseDir = os.TempDir()
+		}
+
+		socketFile = filepath.Join(baseDir, "limeade.sock")
 	}
 }
