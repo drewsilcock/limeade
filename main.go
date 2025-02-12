@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"log/slog"
 	"os"
 	"runtime/debug"
@@ -21,7 +22,7 @@ func main() {
 	))
 
 	if err := setVersionInfo(); err != nil {
-		slog.Error("failed to set version info: %s", err)
+		slog.Error(fmt.Sprintf("failed to set version info: %s", err.Error()))
 	}
 
 	cmd.Execute()
