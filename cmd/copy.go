@@ -45,20 +45,31 @@ func init() {
 func runCopy(argText string) {
 	text := argText
 
+	// First check if stdin is a terminal
 	stdinStat, err := os.Stdin.Stat()
 	if err != nil {
 		slog.Error(fmt.Sprintf("unable to stat stdin: %s", err.Error()))
 		os.Exit(1)
 	}
 
-	if stdinStat.Size() > 0 {
+	// Check if stdin is a pipe or a redirection (not a terminal)
+	if (stdinStat.Mode() & os.ModeCharDevice) == 0 {
 		stdin, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			slog.Error(fmt.Sprintf("unable to read from stdin: %s", err.Error()))
 			os.Exit(1)
 		}
 
-		text = string(stdin)
+		// Only use stdin if it's not empty
+		if len(stdin) > 0 {
+			text = string(stdin)
+		}
+	}
+
+	// If text is still empty after checking stdin, and no arg was provided, exit
+	if text == "" {
+		slog.Error("no text to copy: provide text either as an argument or via stdin")
+		os.Exit(1)
 	}
 
 	slog.Debug(fmt.Sprintf("copying text to '%s': %s", socketFile, text))
