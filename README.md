@@ -130,14 +130,16 @@ This can happen if the server fails to listen on the desired socket path, e.g. i
 Most commonly, this happens if you SSH into a server, quit the SSH connection, then reconnect. For some reason, by default OpenSSH has two 'features': a) don't clean up forward socket files on remote machine and b) fail to forward socket file if it already exists. You can either manually clean up this file every time which is a pain, or you can set the `StreamLocalBindUnlink` option to `yes` in the `sshd_config`:
 
 ```shell
-sudo sh -c 'echo "StreamLocalBindUnlink yes" >> /etc/ssh/sshd_config'
+sudo sh -c 'echo "StreamLocalBindUnlink yes" > /etc/ssh/sshd_config.d/10-stream-local-bind-unlink.conf'
 ```
 
 (For more details, see [this Unix StackExchange post](https://unix.stackexchange.com/questions/427189/how-to-cleanup-ssh-reverse-tunnel-socket-after-connection-closed)).
 
-**Caveat:** with the `StreamLocalBindUnlink` option enabled, the socket file will be valid as long as the most recently connected SSH session is still connected. Because SSH unlinks (deletes) the socket file before binding, the most recent SSH session will be the one doing the actual forwarding. If that quits, the socket forwarding will fail for any other connected sessions.
+**Caveat 1:** with the `StreamLocalBindUnlink` option enabled, the socket file will be valid as long as the most recently connected SSH session is still connected. Because SSH unlinks (deletes) the socket file before binding, the most recent SSH session will be the one doing the actual forwarding. If that quits, the socket forwarding will fail for any other connected sessions.
 
-One solution to this is that you only do the socket forwarding for one SSH session at a time and if you need multiple SSH sessions connected concurrently, you simply omit the socket forward from all of the subsequent SSH sessions after the initial one. That way, only the first SSH session is doing the forwarding.
+**Caveat 2:** the `StreamLocalBindUnlink` will fail to unlink if you switch the user you are using to connect, meaning the socket belongs to another user and you do not have permission to unlink it. You can debug this using technique described below and fix it by simply doing `sudo rm /tmp/limeade.sock` before reconnecting.
+
+One solution to this is that you only do the socket forwarding for one SSH session at a time and if you need multiple SSH sessions connected concurrently, you simply omit the socket forward from all the subsequent SSH sessions after the initial one. That way, only the first SSH session is doing the forwarding.
 
 ### That didn't work
 

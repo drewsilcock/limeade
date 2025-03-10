@@ -2,11 +2,11 @@ EXIT_SUCCESS=0
 EXIT_TEST_FAILURE=1
 EXIT_SCRIPT_ERROR=2
 
-TOTAL_NUM_TESTS=3
+TOTAL_NUM_TESTS=4
 
 function require_command {
-  cmd="$1"
-  install_help="$2"
+  local cmd="$1"
+  local install_help="$2"
 
   if ! command -v $cmd &> /dev/null; then
     echo "$cmd is required to run this script"
@@ -27,10 +27,10 @@ function start_server {
 }
 
 function test_copy_stdin {
-  copy_cmd=$1
-  paste_cmd=$2
+  local copy_cmd=$1
+  local paste_cmd=$2
 
-  stdin_copy_text="I will show you something different from either"
+  local stdin_copy_text="I will show you something different from either"
 
   $copy_cmd ""
 
@@ -44,11 +44,31 @@ function test_copy_stdin {
   fi
 }
 
-function test_copy_arg {
-  copy_cmd=$1
-  paste_cmd=$2
+function test_copy_file_stdin {
+  local copy_cmd=$1
+  local paste_cmd=$2
 
-  arg_copy_text="Your shadow at morning striding behind you or your shadow at evening rising to meet you"
+  local stdin_copy_text="Your shadow at morning striding behind you"
+
+  $copy_cmd ""
+
+  local fname="/tmp/limeade-test-copy-file-stdin.txt"
+  echo $stdin_copy_text > $fname
+  cat $fname | go run ./... copy
+  if [[ $($paste_cmd) = $stdin_copy_text ]]; then
+    echo "✅ Copy file stdin test passed"
+    return 0
+  else
+    echo "❌ Copy file stdin test failed"
+    return 1
+  fi
+}
+
+function test_copy_arg {
+  local copy_cmd=$1
+  local paste_cmd=$2
+
+  local arg_copy_text="Or your shadow at evening rising to meet you"
 
   $copy_cmd ""
 
@@ -63,10 +83,10 @@ function test_copy_arg {
 }
 
 function test_paste {
-  copy_cmd=$1
-  paste_cmd=$2
+  local copy_cmd=$1
+  local paste_cmd=$2
 
-  paste_text="I will show you fear in a handful of dust."
+  local paste_text="I will show you fear in a handful of dust."
 
   $copy_cmd "$paste_text"
 
@@ -80,7 +100,7 @@ function test_paste {
 }
 
 function summarise_tests {
-  num_fails=$1
+  local num_fails=$1
 
   if [[ $num_fails == 0 ]]; then
     echo "✅ All $TOTAL_NUM_TESTS/$TOTAL_NUM_TESTS tests passed"
@@ -95,7 +115,7 @@ function run {
   copy_cmd=$1
   paste_cmd=$2
 
-  num_fails=0
+  local num_fails=0
 
   go run ./... --version
 
@@ -103,6 +123,9 @@ function run {
   start_server
 
   test_copy_stdin $copy_cmd $paste_cmd
+  num_fails=$(($num_fails+$?))
+
+  test_copy_file_stdin $copy_cmd $paste_cmd
   num_fails=$(($num_fails+$?))
 
   test_copy_arg $copy_cmd $paste_cmd
